@@ -1,0 +1,174 @@
+blueprint:
+  name: IKEA Somrig two button shortcut remote using Matter,
+  description: Configure a buttons on an IKEA Somrig Matter connected remote.
+  domain: automation
+  source_url: https://github.com/bengtmartensson/homeassistant-blueprints/automation/ikea-somrig-matter.yaml
+  author: Bengt Martensson
+  input:
+    button_up:
+      name: Up Button to use
+      default: ''
+      selector:
+        entity:
+          multiple: false
+          filter:
+          - integration: matter
+            domain:
+            - event
+            device_class:
+            - button
+          reorder: false
+
+    button_down:
+      name: Down Button to use
+      default: ''
+      selector:
+        entity:
+          multiple: false
+          filter:
+          - integration: matter
+            domain:
+            - event
+            device_class:
+            - button
+          reorder: false
+# IKEA Somrig: multi_press_1, multi_press_2, long_press, long_release
+    action_button_up_short:
+      name: (Optional) Up button short press
+      description: Action to run on short button press.
+      default: []
+      selector:
+        action: {}
+
+    action_button_up_double:
+      name: (Optional) Up button double press
+      description: Action to run on double button press.
+      default: []
+      selector:
+        action: {}
+
+    action_button_up_long:
+      name: (Optional) Up button long press
+      description: Action to run on long button press.
+      default: []
+      selector:
+        action: {}
+
+    action_button_up_release:
+      name: (Optional) Up button long release
+      description: Action to run on long button release.
+      default: []
+      selector:
+        action: {}
+
+    action_button_down_short:
+      name: (Optional) Down button short press
+      description: Action to run on short button press.
+      default: []
+      selector:
+        action: {}
+
+    action_button_down_double:
+      name: (Optional) Down button double press
+      description: Action to run on double button press.
+      default: []
+      selector:
+        action: {}
+
+    action_button_down_long:
+      name: (Optional) Down button long press
+      description: Action to run on long button press.
+      default: []
+      selector:
+        action: {}
+
+    action_button_down_release:
+      name: (Optional) Down button long release
+      description: Action to run on long button release.
+      default: []
+      selector:
+        action: {}
+
+mode: single
+max_exceeded: silent
+
+triggers:
+- trigger: state
+  entity_id:
+    - !input button_up
+  id: up
+- trigger: state
+  entity_id:
+    - !input button_down
+  id: down
+conditions: []
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - up
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_up
+                    attribute: event_type
+                    state: multi_press_1
+                sequence: !input action_button_up_short
+
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_up
+                    attribute: event_type
+                    state: multi_press_2
+                sequence: !input action_button_up_double
+
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_up
+                    attribute: event_type
+                    state: long_press
+                sequence: !input action_button_up_long
+
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_up
+                    attribute: event_type
+                    state: long_release
+                sequence: !input action_button_up_release
+        
+      - conditions:
+          - condition: trigger
+            id:
+              - down
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_down
+                    attribute: event_type
+                    state: multi_press_1
+                sequence: !input action_button_down_short
+
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_down
+                    attribute: event_type
+                    state: multi_press_2
+                sequence: !input action_button_down_double
+
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_down
+                    attribute: event_type
+                    state: long_press
+                sequence: !input action_button_down_long
+
+              - conditions:
+                  - condition: state
+                    entity_id: !input button_down
+                    attribute: event_type
+                    state: long_release
+                sequence: !input action_button_down_release

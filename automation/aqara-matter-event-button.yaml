@@ -1,0 +1,94 @@
+blueprint:
+  name: Aqara Matter event button
+  description: Configure a buttons on an Aqara Matter connected button remote.
+  domain: automation
+  source_url: https://github.com/bengtmartensson/homeassistant-blueprints/automation/matter_event_button.yaml
+  author: Bengt Martensson
+  input:
+    button:
+      name: Button to use
+      default: ''
+      selector:
+        entity:
+          multiple: false
+          filter:
+          - integration: matter
+            domain:
+            - event
+            device_class:
+            - button
+          reorder: false
+# Aqara Mini/H2: multi_press_1, multi_press_2, (long_press,) long_release
+    action_button_short:
+      name: (Optional) button short press
+      description: Action to run on short button press.
+      default: []
+      selector:
+        action: {}
+
+    action_button_double:
+      name: (Optional) button double press
+      description: Action to run on double button press.
+      default: []
+      selector:
+        action: {}
+
+#    action_button_long:
+#      name: (Optional) button long press
+#      description: Action to run on long button press.
+#      default: []
+#      selector:
+#        action: {}
+
+    action_button_release:
+      name: (Optional) button long release
+      description: Action to run on long button release.
+      default: []
+      selector:
+        action: {}
+
+#    action_button_always:
+#      name: (Optional) button all presses
+#      description: Action to run on all presses of the button.
+#      default: []
+#      selector:
+#        action: {}
+
+mode: single
+max_exceeded: silent
+
+triggers:
+- trigger: state
+  entity_id:
+  - !input button
+conditions: []
+
+actions:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: !input button
+            attribute: event_type
+            state: multi_press_1
+        sequence: !input action_button_short
+
+      - conditions:
+          - condition: state
+            entity_id: !input button
+            attribute: event_type
+            state: multi_press_2
+        sequence: !input action_button_double
+
+#      - conditions:
+#          - condition: state
+#            entity_id: !input button
+#            attribute: event_type
+#            state: long_press
+#        sequence: !input action_button_long
+
+      - conditions:
+          - condition: state
+            entity_id: !input button
+            attribute: event_type
+            state: long_release
+        sequence: !input action_button_release

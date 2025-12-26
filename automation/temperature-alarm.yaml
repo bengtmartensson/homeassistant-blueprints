@@ -1,0 +1,43 @@
+blueprint:
+  name: Temperature alarm notification
+  description: Alarm by too high temperatures
+  domain: automation
+  author: Bengt Martensson
+  input:
+    temperature_sensor:
+      name: temperature sensor
+      description: Temperature sensor to observe
+      selector:
+        entity:
+          device_class: temperature
+
+    threshold_temperature:
+      name: threshold
+      description: Threshold when an alarm should be issued.
+      selector:
+        number:
+          min: -20
+          max: 30
+          step: 1
+          unit_of_measurement: "°C"
+          mode: slider
+
+    warning_message:
+      name: Warning message
+      description: Warning message to send
+
+trigger:
+  - platform: numeric_state
+    entity_id:
+      - !input temperature_sensor
+    above: !input threshold_temperature
+condition: []
+action:
+#  - service: notify.persistent_notification
+#    data:
+#      message: !input warning_message
+  - service: notify.mobile_app_xq_es54
+    data:
+      message: !input warning_message
+      title: Temperature alert
+mode: single

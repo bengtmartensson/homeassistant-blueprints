@@ -1,0 +1,81 @@
+blueprint:
+  name: Window opened or closed notification
+  description: "Slightly silly notifications of window opening or closing"
+  domain: automation
+  author: Bengt Martensson
+  input:
+#    window_name:
+#      description: Friendly name of the widow, to be reported
+#      default: Unnamed window
+#      selector:
+#        area:
+    window_sensor:
+      name: sensor
+      description: window sensor to use
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: window
+#          device_class: [ window, door ]
+
+#    notify_device:
+#      name notify device
+#      description: Device to use for notifications
+#      selector:
+      
+trigger:
+  - platform: state
+    entity_id:
+      - !input window_sensor
+    from: "off"
+    to: "on"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+    id: opening
+  - platform: state
+    entity_id:
+      - !input window_sensor
+    from: "on"
+    to: "off"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
+    id: closing
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - opening
+        sequence:
+          - service: notify.alexa_media_echo_kitchen_2
+            metadata: {}
+            data:
+              message: >-
+                Thank you for opening the window.
+                Now it is
+                {{ states('sensor.aqara_temp_humidity_sensor_balcony_temperature') | float(0) }}
+                degrees outside.
+      - conditions:
+          - condition: trigger
+            id:
+              - closing
+        sequence:
+          - service: notify.alexa_media_echo_kitchen_2
+            metadata: {}
+            data:
+              message: >-
+                Thank you for closing the window.
+mode: single
+
+# Local Variables: ***
+# mode:Fundamental  ***
+# comment-column:0 ***
+# comment-start: "# "  ***
+# comment-end:"" ***
+# indent-tabs-mode: nil ***
+# End: ***
