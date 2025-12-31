@@ -40,4 +40,4 @@ action:
     data:
       message: !input warning_message
       title: Temperature alert
-mode: single
+mode: restart
